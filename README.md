@@ -1,6 +1,8 @@
 # WCSearchAPIMARCHarvester
 <h2>Introduction to PQMarcDownload.py</h2>
-The WCSearchAPIMARCHarvester is a little Python script that uses the <a href= "http://docs.python-requests.org/en/master/">Requests library</a> with the <a href="https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html">OCLC WorldCat Search API</a> to query OCLC master records and download matching records. This query, designed to find records for ProQuest Dissertations and Theses Global, searches OCLC indexes for material types (mt) matching "deg", which match the user-inputted URL and publication year. The API returns records in MARC21XML, and the script then writes the results (100 titles per page) to a file and then goes through the results up to the 10,000th result (the API's limit). One drawback of the script is that it doesn't know when the API is not returning new results, so if you query returns 1,000 titles, it will keep querying the API until its counter hits 10,000. While not ideal, you will be able to see the script running much quicker in the terminal and can simply terminate the program at that point. For folks like me at libraries using WorldCat Discovery, you can then transform these records into a KBART file, upload it to collection manager to create a new KB collection or enhance the metadata of an existing collection.
+PQMarcDownload is a little Python script that uses the <a href= "http://docs.python-requests.org/en/master/">Requests library</a> with the <a href="https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html">OCLC WorldCat Search API</a> to query OCLC master records and download matching records. This query, designed to find records for ProQuest Dissertations and Theses Global,searches OCLC indexes for items whose material type (mt) matches "deg", and matches the url and year the user inputs.
+
+The API returns records in MARC21XML, and the script iterates through the results (100 titles at a time up through the 10,000th result which is the API's limit) and writes the results to a file. One drawback of the script is that it doesn't know it has iterated through the results, so if you query returns 1,000 titles, it will keep querying the API until its internal counter hits 10,000. However, each time the script starts a new loop, it prints out the number for the top result on that page (ex. 101, 201, 301, 401, etc). If the script starts printing that information out rapidly it is a sign that it has downloaded everything and you can close the program. There is minimal harm in letting the script run to 10,000; it just means a little extra to clean up later on but also keep in mind OCLC limits the number of queries you can run a day.
 
 I'm not much of a programmer, so if anyone has any ideas or suggestions, I'm very open to learning!
 
@@ -25,6 +27,14 @@ After downloading the script:
 <h2>Clean up and Transformation</h2>
 <ul>
   <li>After running a few batches of the query for the same KB collection, I copy all the MARCXML into a single text file and begin to remove the 856 fields I don't want. Regular expressions can be pretty powerful to remove the urls you don't want and keep the ones you do behind.</li>
+  <li>You'll also need to get rid of any other XML that isn't part of the Marc records:</li>
+  
+  ```
+<searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/" xmlns:oclcterms="http://purl.org/oclc/terms/"                      xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:diag="http://www.loc.gov/zing/srw/diagnostic/"              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<version>1.1</version>
+<numberOfRecords>3128</numberOfRecords>
+ ```
+ 
   <li>Once I'm satisfied with the 856s, I run MarcEdit's MarcBreaker (MARC21XML=>MARC) to convert the MARCXML into MARC. (I recommend setting the "Default Character Encoding" to UTF-8).</li>
   <li>Then I use the MARC2KBART plugin to transform the MARC records into a KBART file. The OCNs are are likely to not be carried over, so I recommend using the tab delimited export feature to export the 001 fields. I've also noticed that many dates aren't carried over so I also recommend exporting the 260$c and the 264$c just in case (you may also wish to export additional fields for identification purposes such as 245$a or 856$c).</li>
   <li>Once you've copied over the OCLC Numbers from the second file, eyeball the url field in the KBART. You may want to check the filter for that column in Excel too; you're likely to find that there are urls you missed cleaning up or there are incomplete urls (for example a url just to search.proquest.com and not a url to a specific item). My personal preference is to cut those rows and past them into a seperate file to work on after I upload all the data ready to be uploaded.</li>
