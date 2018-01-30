@@ -5,7 +5,7 @@ import requests
 
 year = str(raw_input('Please input the year for your query: '))
 wskey = str(raw_input('Please provide your wskey: '))
-print('If you are want to search for search.proquest.com, enter PQ1. If you want to search for gateway.proquest.com enter PQ2."
+print('If you are want to search for search.proquest.com, enter PQ1. If you want to search for gateway.proquest.com enter PQ2.")
 urlInput = str(raw_input('Please provide url for query: '))
 
 if urlInput == "PQ1"
