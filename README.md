@@ -27,7 +27,8 @@ After downloading the script:
 <h2>Clean up and Transformation</h2>
 <ul>
   <li>After running a few batches of the query for the same KB collection, I copy all the MARCXML into a single text file and begin to remove the 856 fields I don't want. Regular expressions can be pretty powerful to remove the urls you don't want and keep the ones you do behind.</li>
-  <li>You'll also need to get rid of any other XML that isn't part of the Marc records:</li>
+  <li>You'll also need to get rid of any other XML that isn't part of the MARC records to make sure MarcEdit can read the file. For example:</li>
+This will appear before each loop so you can get rid of this with replace all:
   
   ```
 <searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/" xmlns:oclcterms="http://purl.org/oclc/terms/"                      xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:diag="http://www.loc.gov/zing/srw/diagnostic/"              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -35,6 +36,55 @@ After downloading the script:
 <numberOfRecords>3128</numberOfRecords>
  ```
  
+ This will be at the end of each loop and needs to be deleted:
+ 
+ ```
+ <nextRecordPosition>401</nextRecordPosition>
+<resultSetIdleTime/>
+<echoedSearchRetrieveRequest xmlns:srw="http://www.loc.gov/zing/srw/">
+<version>1.1</version>
+<query>srw.am="gateway.proquest.com/*" and srw.mt=deg and srw.yr=2017</query>
+<maximumRecords>100</maximumRecords>
+<recordPacking>xml</recordPacking>
+<startRecord>301</startRecord>
+<sortKeys>relevance</sortKeys>
+<wskey>tJNbzAmM1rK5dzXShgp2DEamIZnAdYMVk0vK2deNmsexsySV79Mn3u3Pu8cNaQCKdjkqibt6XgVmeglQ</wskey>
+<servicelevel>full</servicelevel>
+</echoedSearchRetrieveRequest>
+</searchRetrieveResponse>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet type='text/xsl' href='/webservices/catalog/xsl/searchRetrieveResponse.xsl'?>
+```
+ 
+ Lastly, something like this will appear at the end of your query file. This is mostly what is generated when the script is looping after downloading everything your query returned:
+ 
+ ```
+ <searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/" xmlns:oclcterms="http://purl.org/oclc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:diag="http://www.loc.gov/zing/srw/diagnostic/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<version>1.1</version>
+<numberOfRecords>836</numberOfRecords>
+<records/>
+<nextRecordPosition/>
+<resultSetIdleTime/>
+<diagnostics xmlns:srw="http://www.loc.gov/zing/srw/" xmlns:srw8="info:srw/extension/8/spelling" xmlns:srw2="http://www.loc.gov/zing/srw/update/" xmlns:srw3="http://www.loc.gov/zing/srw/diagnostic/" xmlns:srw6="info:srw/extension/6/facetSummary" xmlns:srw7="info:srw/extension/7/componentpostings" xmlns:srw4="http://www.loc.gov/zing/cql/xcql/" xmlns:srw5="info:srw/extension/5/restrictorSummary">
+<srw3:diagnostic>
+<srw3:uri>info:srw/diagnostic/1/13</srw3:uri>
+<srw3:details>1</srw3:details>
+<srw3:message> Present request out of range</srw3:message>
+</srw3:diagnostic>
+</diagnostics>
+<echoedSearchRetrieveRequest xmlns:srw="http://www.loc.gov/zing/srw/">
+<version>1.1</version>
+<query></query>
+<maximumRecords></maximumRecords>
+<recordPacking>xml</recordPacking>
+<startRecord></startRecord>
+<sortKeys>relevance</sortKeys>
+<wskey></wskey>
+<servicelevel>full</servicelevel>
+</echoedSearchRetrieveRequest>
+</searchRetrieveResponse>
+```
+<li>You also need to delete all instances of all "records" elements (note: do not delate any "record" elements"). After removing all "records" elements, you should use records as your root element and add it to the beginning and end of your file.</li>
   <li>Once I'm satisfied with the 856s, I run MarcEdit's MarcBreaker (MARC21XML=>MARC) to convert the MARCXML into MARC. (I recommend setting the "Default Character Encoding" to UTF-8).</li>
   <li>Then I use the MARC2KBART plugin to transform the MARC records into a KBART file. The OCNs are are likely to not be carried over, so I recommend using the tab delimited export feature to export the 001 fields. I've also noticed that many dates aren't carried over so I also recommend exporting the 260$c and the 264$c just in case (you may also wish to export additional fields for identification purposes such as 245$a or 856$c).</li>
   <li>Once you've copied over the OCLC Numbers from the second file, eyeball the url field in the KBART. You may want to check the filter for that column in Excel too; you're likely to find that there are urls you missed cleaning up or there are incomplete urls (for example a url just to search.proquest.com and not a url to a specific item). My personal preference is to cut those rows and past them into a seperate file to work on after I upload all the data ready to be uploaded.</li>
