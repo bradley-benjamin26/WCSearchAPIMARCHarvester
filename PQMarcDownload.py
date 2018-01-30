@@ -3,33 +3,31 @@
 
 import requests
 
-beginYear = int(raw_input('Please input year query to begin:'))
-endYear = int(raw_input('And when would you like this query to end?'))
-queryYear = beginYear
-beginPoint = 1
+year = str(raw_input('Please input the year for your query: '))
+wskey = str(raw_input('Please provide your wskey: '))
+print('If you are want to search for search.proquest.com, enter PQ1. If you want to search for gateway.proquest.com enter PQ2."
+urlInput = str(raw_input('Please provide url for query: '))
 
-while queryYear <= endYear:
-	#user inputs which record the query should begin, startPoint. This value is passed into the variable beginPoint which is then iterated through with a while loop.
-	with open("PQTD" + str(queryYear) + ".txt", "a+") as f:
-	#creates a textfile which includes the year of the query in the file name for the sake of clarity.
-		if beginPoint <= 10001:
-			with open("PQTD" + str(queryYear) + ".txt", "a+") as f:
-				print("New value of beginPoint is: ", beginPoint)
-				urlYear = str(queryYear)
-				url = 'http://www.worldcat.org/webservices/catalog/search/worldcat/sru?query=srw.am%3D%22search.proquest.com%2a%22+and+srw.mt%3Ddeg+and+srw.yr%3D'+urlYear+'&wskey=tJNbzAmM1rK5dzXShgp2DEamIZnAdYMVk0vK2deNmsexsySV79Mn3u3Pu8cNaQCKdjkqibt6XgVmeglQ&servicelevel=full&maximumRecords=100&startRecord='
-	#once the beginPoint has surpassed 10,000 records, the script ends and closes the file.
- 				requestingURL = url + str(beginPoint)
- 				print(requestingURL)
- 				r = requests.get(requestingURL).text
- 				marcRecords = r.encode('utf-8')
- 				f.write(marcRecords)
- 				f.close()
- 				beginPoint += 100
- 			#writes the results of the api query to the file
-			#adds 100 to the beginPoint and the loop starts again.
-		else:
-			f.close()
-			queryYear += 1
-			print('Completed: ', queryYear, "Records retrieved: ", beginPoint)
-else:
-	print("Completed query")
+if urlInput == "PQ1"
+      queryUrl= "search.proquest.com/"
+elsif urlInput == "PQ2"
+      queryUrl = "gateway.proquest.com/"
+else
+      queryUrl = urlInput
+
+beginPoint = 1
+with open("PQDTMarcRecords" + year + ".txt", "a+") as f:
+#Creates and opens a text file and gives it the name PQDTMarcRecords and then the year given for the query (ex. PQDTMarcRecords2018)
+	if beginPoint <= 10001:
+		print("New value of beginPoint is: ", beginPoint)
+		url = 'http://www.worldcat.org/webservices/catalog/search/worldcat/sru?query=srw.am%3D%22'+queryUrl+'%2a%22+and+srw.mt%3Ddeg+and+srw.yr%3D'+year+'&wskey='+wskey+'&servicelevel=full&maximumRecords=100&startRecord=' + str(beginPoint)
+	#url variable includes the url that is being searched for, the material type for dissertation, the input year, the wskey that you MUST provide, and the variable for the beginning point for the page
+ 		r = requests.get(url).text
+ 		marcRecords = r.encode('utf-8')
+ 		f.write(marcRecords)
+	#sends the request and writes the MARCXML to the file
+ 		beginPoint += 100
+ 	#100 is added to the beginPoint, and the loop runs again
+	else:
+		f.close()
+		print('done')
