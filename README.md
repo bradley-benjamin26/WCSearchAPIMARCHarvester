@@ -1,4 +1,10 @@
 # WCSearchAPIMARCHarvester
+
+
+<h2>This documentation is out of date and I am working on providing updated documentation</h2>
+
+
+
 <h2>Introduction to PQMarcDownload.py</h2>
 PQMarcDownload is a little Python script that uses the <a href= "http://docs.python-requests.org/en/master/">Requests library</a> with the <a href="https://www.oclc.org/developer/develop/web-services/worldcat-search-api.en.html">OCLC WorldCat Search API</a> to query OCLC master records and download matching records. This query, designed to find records for ProQuest Dissertations and Theses Global,searches OCLC indexes for items whose material type (mt) matches "deg", and matches the url and year the user inputs.
 
