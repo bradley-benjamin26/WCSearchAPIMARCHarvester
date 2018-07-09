@@ -33,7 +33,6 @@ if degChecker == 'yes':
 else:
 	deg = ''
 
-#if the query returns more than 10,000 results which is greater than can be downloaded, the script performs a search through the alphabet for titles otherwise it will iterate through results by pages only
 def downloader(queryUrl):
 	url = 'http://www.worldcat.org/webservices/catalog/search/worldcat/sru?query=srw.am%3D%22'+queryUrl+'%2a%22'+deg+ebk+lang+'+and+srw.yr%3D'+year+'&wskey='+wskey+'&servicelevel=full'
 	
