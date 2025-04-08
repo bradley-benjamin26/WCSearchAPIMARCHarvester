@@ -41,9 +41,9 @@ def downloader(queryUrl):
 	records = r.encode('utf-8')
 	marcRecords = str(records)
 	m = re.search(r'<numberOfRecords>(\d+)</numberOfRecords>', marcRecords)
-	beginpointMax = int(m.group(1))
-	
+	beginpointMax = int(m.group(1))	
 	if beginpointMax > 10000:
+		#if the search yielded more than 10000 results, the script runs queries based on the first letter in the title
 		print('Results greater than 10,000. Performing title searches ' + str(beginpointMax))
 		with open(title + ".txt", "a+") as f:	
 			for letter in alpha:
@@ -55,6 +55,7 @@ def downloader(queryUrl):
 				max = int(m.group(1))
 				print("Performing author search, title search returned too many hits: ", max)
 				if max > 10000:
+				#if the title search yields more than 10,000 results, it will run queries based on the first letter of the author's name.
 					authorAlpha = alpha
 					for authorLetter in authorAlpha:
 						beginPoint = 1
@@ -69,6 +70,7 @@ def downloader(queryUrl):
 							m = re.search(r'<numberOfRecords>(\d+)</numberOfRecords>', data)
 							max = int(m.group(1))
 				else:
+				#title search
 					beginPoint = 1			
 					while beginPoint <= max + 1:
 						print(letter, beginPoint, max)
@@ -84,6 +86,7 @@ def downloader(queryUrl):
 				print('done')
 		
 	else:	
+		#
 		beginPoint = 1
 		while beginPoint <= beginpointMax + 1:
 			with open(title + ".txt", "a+") as f:
@@ -105,7 +108,7 @@ def downloader(queryUrl):
 		else:
 			print('done')
 
-
+#If looking for proquest urls, the script will search based on three known proquest urls, otherwise it just searches the inputted url
 if urlInput == "PQ":
 	downloader("search.proquest.com/")
 	downloader("gateway.proquest.com/")
